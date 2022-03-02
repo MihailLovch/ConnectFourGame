@@ -1,22 +1,30 @@
-package connectfour
-fun printTable(rows: Int, columns: Int):Unit {
+fun printTable(gameTable: MutableList<String>): Unit {
+    val columns = gameTable[0].length/2
+    val rows = gameTable.size
     for (i in 1..columns) {
         print(" $i")
     }
     print("\n")
-    var str = "║"
     var under = "╚═"
-    for (i in 1..columns) {
-        str +=" ║"
-    }
     for (i in 1 until columns){
         under += "╩═"
     }
     under += "╝"
-    for (i in 1..rows) {
-        println(str)
+    for (i in 0 until rows) {
+        println(gameTable[i])
     }
     println(under)
+}
+fun createTable(rows: Int, columns: Int): MutableList<String> {
+    var str = "║"
+    val gameTable = mutableListOf<String>()
+    for (i in 1..columns) {
+        str +=" ║"
+    }
+    for (i in 1..rows) {
+        gameTable.add(str)
+    }
+    return gameTable
 }
 fun main() {
     println("Connect Four")
@@ -56,5 +64,7 @@ fun main() {
         }
     }
     println("$firstName VS $secondName\n$rows X $columns board")
-    printTable(rows, columns)
+    val gameBoard = createTable(rows, columns)
+    printTable(gameBoard)
+
 }
