@@ -1,5 +1,23 @@
 package connectfour
-
+fun printTable(rows: Int, columns: Int):Unit {
+    for (i in 1..columns) {
+        print(" $i")
+    }
+    print("\n")
+    var str = "║"
+    var under = "╚═"
+    for (i in 1..columns) {
+        str +=" ║"
+    }
+    for (i in 1 until columns){
+        under += "╩═"
+    }
+    under += "╝"
+    for (i in 1..rows) {
+        println(str)
+    }
+    println(under)
+}
 fun main() {
     println("Connect Four")
     println("First player's name:")
@@ -38,4 +56,5 @@ fun main() {
         }
     }
     println("$firstName VS $secondName\n$rows X $columns board")
+    printTable(rows, columns)
 }
