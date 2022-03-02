@@ -38,6 +38,13 @@ fun addToTable(column: Int, gameBoard: MutableList<String>, toPut: Char): Mutabl
     }
     return gameBoard
 }
+fun printName(firstName: String, secondName:String,isFirst: Boolean) {
+    if (isFirst) {
+        println("$firstName's turn:")
+    }else {
+        println("$secondName's turn:")
+    }
+}
 fun main() {
     println("Connect Four")
     println("First player's name:")
@@ -76,17 +83,40 @@ fun main() {
         }
     }
     println("$firstName VS $secondName\n$rows X $columns board")
-    val gameBoard = createTable(rows, columns)
+    var gameBoard = createTable(rows, columns)
     printTable(gameBoard)
 
     println("$firstName's turn:")
     var gameInput = readLine()!!
     var firstPlayer = true
     while(gameInput != "end") {
-        val col = gameInput.toInt()
-
-        gameInput = readLine()!!
-        firstPlayer = !firstPlayer
+        if (!gameInput.matches("\\d+".toRegex())) {
+            println("Incorrect column number")
+            printName(firstName,secondName,firstPlayer)
+            gameInput = readLine()!!
+            continue
+        }else {
+            val column = gameInput.toInt()
+            if (column !in 1..columns) {
+                println("The column number is out of range (1 - $columns)")
+                printName(firstName,secondName,firstPlayer)
+                gameInput = readLine()!!
+                continue
+            }else {
+                if (gameBoard[0][column*2 -1] != ' ') {
+                    println("Column $column is full")
+                    printName(firstName,secondName,firstPlayer)
+                    gameInput = readLine()!!
+                    continue
+                }
+                val toPut: Char = if (firstPlayer) 'o' else '*'
+                gameBoard = addToTable(column,gameBoard,toPut)
+                firstPlayer = !firstPlayer
+                printTable(gameBoard)
+                printName(firstName,secondName,firstPlayer)
+                gameInput = readLine()!!
+            }
+        }
     }
-    println()
+    println("Game over!")
 }
