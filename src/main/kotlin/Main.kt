@@ -1,3 +1,5 @@
+import java.util.regex.Pattern
+
 fun printTable(gameTable: MutableList<String>) {
     val columns = gameTable[0].length / 2
     val rows = gameTable.size
@@ -32,7 +34,7 @@ fun addToTable(column: Int, gameBoard: MutableList<String>, toPut: Char): Mutabl
     for (i in gameBoard.lastIndex downTo 0) {
         if (gameBoard[i][column * 2 - 1] == ' ') {
             indexs[0] = i
-            indexs[1] = column-1
+            indexs[1] = column - 1
             val stringToChange = gameBoard[i].toMutableList()
             stringToChange[column * 2 - 1] = toPut
             gameBoard[i] = stringToChange.joinToString("")
@@ -63,6 +65,7 @@ fun main() {
     var rows = 6
     var columns = 7
     var failed = true
+    val score = MutableList<Int>(2) { 0 }
     var input = readLine()!!
     while (input.isNotEmpty() && failed) {
         failed = false
@@ -90,51 +93,97 @@ fun main() {
             input = readLine()!!
         }
     }
+    println(
+        """
+        Do you want to play single or multiple games?
+        For a single game, input 1 or press Enter
+        Input a number of games:
+    """.trimIndent()
+    )
+    var numberOfGamesInput = readLine()!!
+    var numberOfGames: Int
+    while (true) {
+        if (numberOfGamesInput.isEmpty()) {
+            numberOfGames = 1
+        } else if (numberOfGamesInput.toIntOrNull() == null || numberOfGamesInput.toInt() <= 0) {
+            println("Invalid input")
+            println(
+                """
+        Do you want to play single or multiple games?
+        For a single game, input 1 or press Enter
+        Input a number of games:
+    """.trimIndent()
+            )
+            numberOfGamesInput = readLine()!!
+        } else {
+            numberOfGames = numberOfGamesInput.toInt()
+            break
+        }
+    }
     println("$firstName VS $secondName\n$rows X $columns board")
     var gameBoard = createTable(rows, columns)
-    printTable(gameBoard)
-
-    println("$firstName's turn:")
-    var gameInput = readLine()!!
-    var firstPlayer = true
-    while (gameInput != "end") {
-        if (!gameInput.matches("\\d+".toRegex())) {
-            println("Incorrect column number")
-            printName(firstName, secondName, firstPlayer)
-            gameInput = readLine()!!
-            continue
-        } else {
-            val column = gameInput.toInt()
-            if (column !in 1..columns) {
-                println("The column number is out of range (1 - $columns)")
+    if (numberOfGames == 1) {
+        println("Single game")
+    }else {
+        println("Total $numberOfGames games")
+    }
+    var isFirstGoing: Boolean = true
+    var firstPlayer = isFirstGoing
+    loop@ for (i in 1..numberOfGames) {
+        println("Game #$i")
+        printTable(gameBoard)
+        println("$firstName's turn:")
+        var gameInput = readLine()!!
+        while (gameInput != "end") {
+            if (gameInput == "end"){
+                break@loop
+            }
+            if (!gameInput.matches("\\d+".toRegex())) {
+                println("Incorrect column number")
                 printName(firstName, secondName, firstPlayer)
                 gameInput = readLine()!!
                 continue
             } else {
-                if (gameBoard[0][column * 2 - 1] != ' ') {
-                    println("Column $column is full")
+                val column = gameInput.toInt()
+                if (column !in 1..columns) {
+                    println("The column number is out of range (1 - $columns)")
                     printName(firstName, secondName, firstPlayer)
                     gameInput = readLine()!!
                     continue
-                }
-                val toPut: Char = if (firstPlayer) 'o' else '*'
-                gameBoard = addToTable(column, gameBoard, toPut)
-                printTable(gameBoard)
-                val validate = checkGame(rows,columns,gameBoard,toPut)
-                if (validate == 1 ) {
-                    if (firstPlayer) {
-                        println("Player $firstName won")
-                    }else{
-                        println("Player $secondName won")
+                } else {
+                    if (gameBoard[0][column * 2 - 1] != ' ') {
+                        println("Column $column is full")
+                        printName(firstName, secondName, firstPlayer)
+                        gameInput = readLine()!!
+                        continue
                     }
-                    break
+                    val toPut: Char = if (firstPlayer) 'o' else '*'
+                    gameBoard = addToTable(column, gameBoard, toPut)
+                    printTable(gameBoard)
+                    val validate = checkGame(rows, columns, gameBoard, toPut)
+                    if (validate != 0) {
+                        if (validate == 1) {
+                            if (firstPlayer) {
+                                println("Player $firstName won")
+                                score[0]++
+                            } else {
+                                println("Player $secondName won")
+                                score[1]++
+                            }
+                        }
+                        if (validate == -1) {
+                            score[0]++
+                            score[1]++
+                        }
+                        println("Score\n$firstName: ${score[0]} $secondName: ${score[1]}")
+                        isFirstGoing = !isFirstGoing
+                        firstPlayer = isFirstGoing
+                        break
+                    }
+                    firstPlayer = !firstPlayer
+                    printName(firstName, secondName, firstPlayer)
+                    gameInput = readLine()!!
                 }
-                if (validate == -1) {
-                    break
-                }
-                firstPlayer = !firstPlayer
-                printName(firstName, secondName, firstPlayer)
-                gameInput = readLine()!!
             }
         }
     }
