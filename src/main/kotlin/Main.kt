@@ -105,6 +105,7 @@ fun main() {
     while (true) {
         if (numberOfGamesInput.isEmpty()) {
             numberOfGames = 1
+            break
         } else if (numberOfGamesInput.toIntOrNull() == null || numberOfGamesInput.toInt() <= 0) {
             println("Invalid input")
             println(
@@ -130,9 +131,9 @@ fun main() {
     var isFirstGoing: Boolean = true
     var firstPlayer = isFirstGoing
     loop@ for (i in 1..numberOfGames) {
-        println("Game #$i")
+        if (numberOfGames != 1)println("Game #$i")
         printTable(gameBoard)
-        println("$firstName's turn:")
+        printName(firstName, secondName, firstPlayer)
         var gameInput = readLine()!!
         while (gameInput != "end") {
             if (gameInput == "end"){
@@ -165,10 +166,10 @@ fun main() {
                         if (validate == 1) {
                             if (firstPlayer) {
                                 println("Player $firstName won")
-                                score[0]++
+                                score[0]+=2
                             } else {
                                 println("Player $secondName won")
-                                score[1]++
+                                score[1]+=2
                             }
                         }
                         if (validate == -1) {
@@ -176,8 +177,10 @@ fun main() {
                             score[1]++
                         }
                         println("Score\n$firstName: ${score[0]} $secondName: ${score[1]}")
+                        count = 0
                         isFirstGoing = !isFirstGoing
                         firstPlayer = isFirstGoing
+                        gameBoard = createTable(rows, columns)
                         break
                     }
                     firstPlayer = !firstPlayer
